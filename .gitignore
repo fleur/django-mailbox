@@ -13,3 +13,5 @@ dummy_project/*
 .tox/
 messages
 *.sqlite3
+.jython_cache/
+Pipfile
