@@ -18,6 +18,9 @@ class TestImap(EmailMessageTestCase):
         self.test_imap_server = (
             os.environ.get('EMAIL_IMAP_SERVER')
         )
+        self.test_imap_use_ssl = (
+            os.environ.get('EMAIL_IMAP_USE_SSL', 'True')
+        )
 
         required_settings = [
             self.test_imap_server,
@@ -31,7 +34,8 @@ class TestImap(EmailMessageTestCase):
                 "Integration tests are not available without having "
                 "the the following environment variables set: "
                 "EMAIL_ACCOUNT, EMAIL_PASSWORD, EMAIL_SMTP_SERVER, "
-                "EMAIL_IMAP_SERVER."
+                "EMAIL_SMTP_PORT, "
+                "EMAIL_IMAP_SERVER, EMAIL_IMAP_USE_SSL."
             )
 
         self.mailbox = Mailbox.objects.create(
@@ -39,9 +43,13 @@ class TestImap(EmailMessageTestCase):
             uri=self.get_connection_string()
         )
         self.arbitrary_identifier = str(uuid.uuid4())
+        print("connection string:", self.get_connection_string())
 
     def get_connection_string(self):
-        return "imap+ssl://{account}:{password}@{server}".format(
+        ssl = "+ssl" if (self.test_imap_use_ssl == 'True') else ''
+        # return "imap+ssl://{account}:{password}@{server}".format(
+        return "imap{ssl}://{account}:{password}@{server}".format(
+            ssl=ssl,
             account=parse.quote(self.test_account),
             password=parse.quote(self.test_password),
             server=self.test_imap_server,
@@ -58,6 +66,7 @@ class TestImap(EmailMessageTestCase):
             ]
         )
         msg.send()
+        print("sent message to receive")
 
         messages = self._get_new_messages(
             self.mailbox,

@@ -45,16 +45,17 @@ class EmailMessageTestCase(TestCase):
         self.test_account = os.environ.get('EMAIL_ACCOUNT')
         self.test_password = os.environ.get('EMAIL_PASSWORD')
         self.test_smtp_server = os.environ.get('EMAIL_SMTP_SERVER')
+        self.test_smtp_port = os.environ.get('EMAIL_SMTP_PORT')
         self.test_from_email = 'nobody@nowhere.com'
 
         self.maximum_wait_seconds = 60 * 5
 
         settings.EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
         settings.EMAIL_HOST = self.test_smtp_server
-        settings.EMAIL_PORT = 587
+        settings.EMAIL_PORT = self.test_smtp_port
         settings.EMAIL_HOST_USER = self.test_account
         settings.EMAIL_HOST_PASSWORD = self.test_password
-        settings.EMAIL_USE_TLS = True
+        settings.EMAIL_USE_TLS = False
         super().setUp()
 
     def _get_new_messages(self, mailbox, condition=None):
